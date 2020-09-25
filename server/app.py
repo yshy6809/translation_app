@@ -31,7 +31,7 @@ class SrcFile(db.Model):
     file_name = db.Column(db.Text)
     file_path = db.Column(db.Text)
     src_language = db.Column(db.String(length=10))
-    project_id = db.Column(db)
+    project_id = db.Column(db.Integer)
 
 
 class Project(db.Model):
