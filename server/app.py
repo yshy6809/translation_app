@@ -1,8 +1,8 @@
 import os
 import sys
-from sys import prefix
 
-from flask import Flask
+import click
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Resource, Api
 
@@ -10,15 +10,19 @@ app = Flask(__name__)
 api = Api(app)
 db = SQLAlchemy(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'data.db'))
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv
 WIN = sys.platform.startswith('win')
 if WIN:
     prefix = 'sqlite:///'
 else:
     prefix = 'sqlite:////'
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', prefix + os.path.join(app.root_path, 'data.db'))
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+@app.cli.command()
+def initdb():
+    db.create_all()
+    click.echo('Initialized database')
 
 
 class TextFlow(db.Model):
@@ -60,20 +64,30 @@ class GetFile(Resource):
 
 class PostFile(Resource):
     def post(self, project_id):
-        pass
+        src_file = request.files.get('src')
+        file_name = request.form.get('file_name')
+        src_file.save(os.path.join(app.root_path, 'static/' + file_name))
+        return "success!"
 
 
 class ProjectResource(Resource):
     def get(self, project_id):
         pass
     
-    def post(self):
-        pass
+    def post(self, project_id):
+        project_name = request.form['project_name']
+        project_type = request.form['project_type']
+        src_lang = request.form['project_src_language']
+        project = Project(project_name=project_name, project_type=project_type, src_language=src_lang)
+        db.session.add(project)
+        db.session.commit()
+        return "success!"
 
 
 api.add_resource(HelloWorld, '/')
-api.add_resource(GetFile, "/api/file/get/<string:file_id>")
-api.add_resource(PostFile, "api/file/upload/<string:project_id>")
+api.add_resource(GetFile, "/api/file/get/<int:file_id>")
+api.add_resource(PostFile, "/api/file/upload/<int:project_id>")
+api.add_resource(ProjectResource, "/api/project/<int:project_id>")
 
 
 
