@@ -2,6 +2,8 @@ import os
 
 from flask_restful import Resource
 from flask import request
+from flask import abort
+from flask import jsonify
 
 from server import app, db
 from server.models import SrcFile, TextFlow, Project
@@ -15,6 +17,17 @@ class GetFile(Resource):
         with open(src_file_data.file_path) as file_obj:
             file_str = file_obj.read()
         return file_str
+
+    def delete(self, file_id):
+        file_data = SrcFile.query.get(file_id)
+        if os.path.exists(file_data.file_path):
+            os.remove(file_data.file_path)
+        text_flow_datas = TextFlow.query.filter(TextFlow.text_file_id == file_id).all()
+        db.session.delete(file_data)
+        for tf_data in text_flow_datas:
+            db.session.delete(tf_data)
+        db.session.commit()
+        return "success!"
 
 
 class PostFile(Resource):
@@ -54,5 +67,18 @@ class ProjectResource(Resource):
         src_lang = request.form['project_src_language']
         project = Project(project_name=project_name, project_type=project_type, src_language=src_lang)
         db.session.add(project)
+        db.session.commit()
+        return "success!"
+
+    def delete(self, project_id):
+        project = Project.query.get(project_id)
+        os.removedirs(os.path.join(app.root_path, "static/" + project.project_name))
+        db.session.delete(project)
+        files = SrcFile.query.filter(SrcFile.project_id == project_id).all()
+        for file_data in files:
+            db.session.delete(file_data)
+            text_flows = TextFlow.query.filter(TextFlow.text_file_id == file_data.id).all()
+            for tf_data in text_flows:
+                db.session.delete(tf_data)
         db.session.commit()
         return "success!"

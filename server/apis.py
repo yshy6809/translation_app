@@ -1,5 +1,5 @@
 from server import api
-from .resources import GetFile, PostFile, ProjectResource
+from server.resources import GetFile, PostFile, ProjectResource
 
 
 api.add_resource(GetFile, "/api/file/get/<int:file_id>")
