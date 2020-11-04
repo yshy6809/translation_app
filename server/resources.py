@@ -82,3 +82,18 @@ class ProjectResource(Resource):
                 db.session.delete(tf_data)
         db.session.commit()
         return "success!"
+
+
+class TextflowResource(Resource):
+    def get(self, id):
+        tf = TextFlow.query.get(id)
+        response = {"data":{}}
+        response['data']['text'] = tf.src_text
+        return jsonify(response)
+
+    def put(self, id):
+        tf = TextFlow.query.get(id)
+        tf.target_text = request.form['target']
+        db.session.commit()
+        return '1'
+
