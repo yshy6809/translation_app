@@ -4,7 +4,7 @@ import os
 
 file_folder = "D:\\translation\\hakui\\hbdlc\\HB-DLC\\HB-DLC\\script"
 file_paths = glob2.glob(file_folder + "\\scene*.rpy")
-project_ids = [i for i in range(3, 103)]
+project_ids = [i for i in range(1, 101)]
 for p_id in project_ids:
     print("pid:", p_id)
     for file_path in file_paths:
