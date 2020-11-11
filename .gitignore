@@ -1,4 +1,5 @@
 .idea
 server/data.db
 server/static/
+dist/
 __pycache__

@@ -1,11 +1,13 @@
 import sys, os, click
 
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 
 
-app = Flask('server')
+app = Flask('server', template_folder='./dist', static_folder='./dist/static')
+cors = CORS(app, resources={r'/api/*':{'origins': '*'}})
 api = Api(app)
 db = SQLAlchemy(app)
 WIN = sys.platform.startswith('win')
@@ -24,3 +26,4 @@ def initdb():
 
 
 from server import apis
+from server import views

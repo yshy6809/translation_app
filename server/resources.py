@@ -1,4 +1,5 @@
 import os
+import random
 
 from flask_restful import Resource
 from flask import request
@@ -96,4 +97,11 @@ class TextflowResource(Resource):
         tf.target_text = request.form['target']
         db.session.commit()
         return '1'
+
+
+class Random(Resource):
+    def get(self):
+        response = {'randomNumber': random.randint(1, 100)}
+        return jsonify(response)
+
 
