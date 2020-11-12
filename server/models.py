@@ -9,6 +9,13 @@ class TextFlow(db.Model):
     translation_status = db.Column(db.Integer)
     text_file_id = db.Column(db.Integer)
 
+    def keys(self):
+        return ('id', 'src_text', 'target_text', 'translation_history',
+                'translation_status', 'text_file_id')
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
 
 class SrcFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)

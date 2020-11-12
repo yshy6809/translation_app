@@ -14,10 +14,18 @@ from server.file_parser import rpy
 class GetFile(Resource):
     def get(self, file_id):
         src_file_data = SrcFile.query.get(file_id)
-        file_str = ""
-        with open(src_file_data.file_path) as file_obj:
-            file_str = file_obj.read()
-        return file_str
+        response = {'file_name': src_file_data.file_name, 'src_language': src_file_data.src_language,
+                    'project_id': src_file_data.project_id, 'text_flows': []}
+        text_flow_datas = TextFlow.query.filter(TextFlow.text_file_id == file_id).all()
+        for tf_data in text_flow_datas:
+            '''
+            data_dict = {}
+            data_dict['id'] = tf_data.id
+            data_dict['src_text'] = tf_data.src_text
+            data_dict['']
+            '''
+            response['text_flows'].append(dict(tf_data))
+        return jsonify(response)
 
     def delete(self, file_id):
         file_data = SrcFile.query.get(file_id)
