@@ -10,11 +10,19 @@
                 <a-button @click="getFile" type='primary'>获取</a-button>
             </p>
         </div>
-        <a-list item-layout="horizontal" :data-source="text_flows" :pagination="pagination">
+        <a-list item-layout="vertical" :data-source="text_flows" :pagination="pagination">
             <a-list-item slot="renderItem" slot-scope="item">
-                <a-card hoverable style="width: 50%;text-align: 'left'">
-                    {{ item.src_text }}
-                </a-card>
+                <div style="display: block">
+                    <a-card hoverable style="max-width: 80%;
+                    margin:auto;
+                    border-radius: 7px;
+                    background-color: rgba(250, 250, 250, 0.9)" :bodyStyle="card_body_style">
+                        {{ item.src_text }}
+                    </a-card>
+                </div>
+                <div style="display: block; max-width: 80%; margin:auto;">
+                    <a-textarea :auto-size="{ minRows: 3 }" :value="file_id" @change="update(item.id)" />
+                </div>
             </a-list-item>
         </a-list>
     </div>
@@ -32,6 +40,9 @@ export default {
             text_flows,
             pagination: {
                 pageSize: 20
+            },
+            card_body_style: {
+                textAlign: 'left'
             }
         }
     },
@@ -55,6 +66,10 @@ export default {
         },
         created () {
             this.getRandom()
+        },
+        update(id) {
+            //const path = 'http://localhost:5000/api/'
+            console.log(id)
         }
     }
 }
