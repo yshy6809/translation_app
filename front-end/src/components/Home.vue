@@ -21,7 +21,7 @@
                     </a-card>
                 </div>
                 <div style="display: block; max-width: 80%; margin:auto;">
-                    <a-textarea :auto-size="{ minRows: 3 }" :value="file_id" @change="update(item.id)" />
+                    <a-textarea :auto-size="{ minRows: 3 }" v-model="item.target_text" @blur="update(item.id)" />
                 </div>
             </a-list-item>
         </a-list>
@@ -32,6 +32,7 @@
 import axios from 'axios'
 
 var text_flows = []
+var target_backup = []
 export default {
     data () {
         return {
@@ -62,14 +63,30 @@ export default {
             axios.get(path).then(response => {
                 console.log(response)
                 this.text_flows = response.data.text_flows
+                target_backup = []
+                this.text_flows.forEach(element => {
+                    target_backup.push(element.target_text)
+                });
+                console.log(target_backup)
             })
         },
         created () {
             this.getRandom()
         },
         update(id) {
-            //const path = 'http://localhost:5000/api/'
-            console.log(id)
+            const path = 'http://localhost:5000/api/text_flow/'+id
+            //console.log(id)            
+            var idx = id - this.text_flows[0].id
+            if (target_backup[idx] != this.text_flows[idx].target_text)
+            {
+                console.log("text has been changed.")
+                axios.put(path, {target: this.text_flows[idx].target_text}).then(response=>{
+                    console.log(response)
+                })
+                target_backup[idx] = this.text_flows[idx].target_text
+            }
+            //console.log(text_flows)
+            //console.log(target_backup)
         }
     }
 }

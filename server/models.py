@@ -5,6 +5,7 @@ class TextFlow(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     src_text = db.Column(db.Text)
     target_text = db.Column(db.Text)
+    speaker = db.Column(db.Text)
     translation_history = db.Column(db.Text)
     translation_status = db.Column(db.Integer)
     text_file_id = db.Column(db.Integer)

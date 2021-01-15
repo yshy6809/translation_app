@@ -7,14 +7,36 @@ class LineType(Enum):
     OTHER = 3
 
 
+def split_sentence(sentence: str):
+    sentence = sentence.strip()
+    in_quote = False
+    n = len(sentence)
+    k = -1
+    for i in range(n):
+        if sentence[i] == '"' and (i == 0 or sentence[i - 1] != '\\'):
+            in_quote = (not in_quote)
+        elif sentence[i] == ' ':
+            if not in_quote:
+                k = i
+                break
+    if k == -1:
+        return "", sentence[1:-1]
+    else:
+        if sentence[0] == '"':
+            return sentence[1:k-1], sentence[k+2:-1]
+        else:
+            return sentence[0:k], sentence[k+2:-1]
+
+
 class FileTextFlow:
-    def __init__(self, id, src, trans) -> None:
+    def __init__(self, id, src, trans, speaker) -> None:
         self.id = id
         self.src = src
         self.trans = trans
+        self.speaker = speaker
 
     def __repr__(self) -> str:
-        return "id:{}, src:{}, trans:{}".format(self.id, self.src, self.trans)
+        return "id:{}, src:{}, trans:{}, speaker:{}".format(self.id, self.src, self.trans, self.speaker)
 
 
 class RpyLine:
@@ -78,13 +100,15 @@ class RpyFile:
             raise ValueError("length of src_lst and trans_lst are not equal!")
         res = []
         for i in range(len(src_lst)):
-            tf = FileTextFlow(i, src_lst[i], trans_lst[i])
+            speaker, src_text = split_sentence(src_lst[i])
+            _, target_text = split_sentence(trans_lst[i])
+            tf = FileTextFlow(i, src_text, target_text, speaker)
             res.append(tf)
         return res
 
 
 if __name__ == '__main__':
-    rf = RpyFile("../HB-DLC/HB-DLC/script/scene1-cactus.rpy", "utf-8-sig")
+    rf = RpyFile("../static/test/scene1-cactus.rpy", "utf-8-sig")
     tfs = rf.get_text_flows()
     for tf in tfs:
         print(tf)

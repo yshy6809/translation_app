@@ -59,7 +59,7 @@ class PostFile(Resource):
         rpy_file = rpy.RpyFile(folder_path + file_name)
         text_flows = rpy_file.get_text_flows()
         for text_flow in text_flows:
-            tf_data = TextFlow(src_text=text_flow.src, target_text=text_flow.trans,
+            tf_data = TextFlow(src_text=text_flow.src, target_text=text_flow.trans, speaker=text_flow.speaker,
                                translation_history="", translation_status=0, text_file_id=text_file.id)
             db.session.add(tf_data)
         db.session.commit()
@@ -102,7 +102,8 @@ class TextflowResource(Resource):
 
     def put(self, id):
         tf = TextFlow.query.get(id)
-        tf.target_text = request.form['target']
+        #tf.target_text = request.form['target']
+        tf.target_text = request.get_json()['target']
         db.session.commit()
         return '1'
 
